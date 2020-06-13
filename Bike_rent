@@ -1,0 +1,103 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn import metrics
+from sklearn import preprocessing
+from sklearn import linear_model
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_predict
+from sklearn.model_selection import cross_val_score
+
+data_hour = pd.read_csv('../input/bike-sharing-dataset/hour.csv')
+data_day = pd.read_csv('../input/bike-sharing-dataset/day.csv')
+data_hour.rename(columns={'instant':'id','dteday':'date', 
+                          'yr':'year', 'mnth':'month',
+                          'hr':'hour', 'weathersit': 'weather',
+                         'cnt':'count'},inplace=True)
+                         
+data_hour=data_hour.drop(['casual','registered'], axis=1)
+data_hour.head()
+data_hour['count'].describe()
+scatter_cnt = sns.jointplot(x='temp', y='count', data=data_hour, kind='scatter')
+scatter_cnt.fig.set_size_inches(10,10)
+
+scatter_cnt = sns.jointplot(x='atemp', y='count', data=data_hour, kind='scatter')
+scatter_cnt.fig.set_size_inches(10,10)
+
+scatter_cnt = sns.jointplot(x='windspeed', y='count', data=data_hour, kind='scatter')
+scatter_cnt.fig.set_size_inches(10,10)
+
+fig,ax = plt.subplots()
+sns.pointplot(data=data_hour[['hour',
+                           'count',
+                           'season']],
+                            hue='season',
+                            y='count',
+                            x='hour',
+                           ax=ax)
+ax.set(title="Колличество проката от времени суток")
+fig,ax = plt.subplots()
+sns.pointplot(data=data_hour[['hour',
+                           'count',
+                           'weekday']],
+                            hue='weekday',
+                            y='count',
+                            x='hour',
+                            ax=ax)
+ ax.set(title="Количество проката от дня недели")
+ 
+ fig,ax = plt.subplots() 
+sns.barplot(data=data_hour[['month', 'count']], 
+           x='month', y='count', ax=ax) 
+ax.set(title="Ежемесячное распределение")
+
+fig,ax = plt.subplots()
+sns.barplot(data=data_hour[['season',
+                           'count']],
+                            x='season',
+                            y='count',
+                            ax=ax)
+
+CorrMat = data_day[['temp', 'hum','windspeed','cnt']].corr()
+fig,ax = plt.subplots()
+sns.heatmap(CorrMat,annot=True, square=True )
+
+data_hour_model = data_hour.copy()
+out = 'count'
+features = [x for x in list(data_hour_model) if x not in [out, 'instant', 'dteday', 
+                                                          'id', 'date']]
+
+X_train, X_test, y_train, y_test= train_test_split(data_hour_model[features],
+                                                   data_hour_model[out],
+                                                  random_state=42)
+from sklearn.preprocessing import PolynomialFeatures
+poly_feat = PolynomialFeatures(3)
+X_train = poly_feat.fit_transform(X_train)
+X_test = poly_feat.fit_transform(X_test)
+
+from sklearn.linear_model import LinearRegression
+lr_model= LinearRegression()
+lr_model.fit(X_train,y_train)
+print(lr_model.score(X_test, y_test))
+
+# Трансформирует категориальные переменные и применим градиентный бустинг
+data_dummy = pd.get_dummies(data_hour_model, columns =['season','weekday','weather'])
+data_dummy.head()
+
+features = [x for x in list(data_dummy) if x not in [out, 'instant', 'dteday', 
+                                                          'id', 'date']]
+data_dummy =data_dummy.dropna()
+
+X_train, X_test, y_train, y_test= train_test_split(data_dummy[features],
+                                                   data_dummy[out],
+                                                  random_state=42)
+from sklearn.preprocessing import PolynomialFeatures
+poly_feat = PolynomialFeatures(3)
+X_train = poly_feat.fit_transform(X_train)
+X_test = poly_feat.fit_transform(X_test)
+
+from sklearn.ensemble import GradientBoostingRegressor
+model_gbr = GradientBoostingRegressor()
+model_gbr.fit(X_train, np.ravel(y_train))
+model_gbr.score(X_test, y_test)
+
+
