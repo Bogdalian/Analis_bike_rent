@@ -14,18 +14,23 @@ data_hour.rename(columns={'instant':'id','dteday':'date',
                           'hr':'hour', 'weathersit': 'weather',
                          'cnt':'count'},inplace=True)
                          
+#удалим неинформативные признаки                   
 data_hour=data_hour.drop(['casual','registered'], axis=1)
 data_hour.head()
+
+#посмотрим статистическую информацию о целевой переменной
 data_hour['count'].describe()
+
+#построим диаграммурассеяния,яние температуры на коооличество арендованных велосипедов 
 scatter_cnt = sns.jointplot(x='temp', y='count', data=data_hour, kind='scatter')
 scatter_cnt.fig.set_size_inches(10,10)
 
-scatter_cnt = sns.jointplot(x='atemp', y='count', data=data_hour, kind='scatter')
-scatter_cnt.fig.set_size_inches(10,10)
-
+#Построим диаграмму, чтобы выявить, как влияет скорость ветра на целевую переменную count
 scatter_cnt = sns.jointplot(x='windspeed', y='count', data=data_hour, kind='scatter')
 scatter_cnt.fig.set_size_inches(10,10)
+#Диаграмма демонстрирует обратную попорциональность
 
+#Распределение прокатаgj часам и сезонам
 fig,ax = plt.subplots()
 sns.pointplot(data=data_hour[['hour',
                            'count',
@@ -34,6 +39,8 @@ sns.pointplot(data=data_hour[['hour',
                             y='count',
                             x='hour',
                            ax=ax)
+                           
+#То же самое, но по времени суток
 ax.set(title="Колличество проката от времени суток")
 fig,ax = plt.subplots()
 sns.pointplot(data=data_hour[['hour',
@@ -45,11 +52,13 @@ sns.pointplot(data=data_hour[['hour',
                             ax=ax)
  ax.set(title="Количество проката от дня недели")
  
- fig,ax = plt.subplots() 
+#Распределение по месяцам
+fig,ax = plt.subplots() 
 sns.barplot(data=data_hour[['month', 'count']], 
            x='month', y='count', ax=ax) 
 ax.set(title="Ежемесячное распределение")
 
+#Построим гистограмму, чтобы выявить аренду по сезонам
 fig,ax = plt.subplots()
 sns.barplot(data=data_hour[['season',
                            'count']],
@@ -57,12 +66,16 @@ sns.barplot(data=data_hour[['season',
                             y='count',
                             ax=ax)
 
+#Построимматрицу корреляции,чтобы выявить неинформативные признкаки
 CorrMat = data_day[['temp', 'hum','windspeed','cnt']].corr()
 fig,ax = plt.subplots()
+#Построим тепловую карту
 sns.heatmap(CorrMat,annot=True, square=True )
+
 
 data_hour_model = data_hour.copy()
 out = 'count'
+#Построим список "исключений"
 features = [x for x in list(data_hour_model) if x not in [out, 'instant', 'dteday', 
                                                           'id', 'date']]
 
@@ -74,10 +87,11 @@ poly_feat = PolynomialFeatures(3)
 X_train = poly_feat.fit_transform(X_train)
 X_test = poly_feat.fit_transform(X_test)
 
+#Используем линейную регрессию
 from sklearn.linear_model import LinearRegression
 lr_model= LinearRegression()
 lr_model.fit(X_train,y_train)
-print(lr_model.score(X_test, y_test))
+print(lr_model.score(X_test, y_test))# модельимеет точность не выше 0.7
 
 # Трансформирует категориальные переменные и применим градиентный бустинг
 data_dummy = pd.get_dummies(data_hour_model, columns =['season','weekday','weather'])
@@ -95,9 +109,10 @@ poly_feat = PolynomialFeatures(3)
 X_train = poly_feat.fit_transform(X_train)
 X_test = poly_feat.fit_transform(X_test)
 
+#Используем градиентный бустинг
 from sklearn.ensemble import GradientBoostingRegressor
 model_gbr = GradientBoostingRegressor()
 model_gbr.fit(X_train, np.ravel(y_train))
-model_gbr.score(X_test, y_test)
+model_gbr.score(X_test, y_test) #Модель имеет точность свыше 0.9
 
 
