@@ -21,7 +21,7 @@ data_hour.head()
 #посмотрим статистическую информацию о целевой переменной
 data_hour['count'].describe()
 
-#построим диаграммурассеяния,яние температуры на коооличество арендованных велосипедов 
+#построим диаграмму рассеяния, чтобы проанализировать влияние температуры на количество арендованных велосипедов 
 scatter_cnt = sns.jointplot(x='temp', y='count', data=data_hour, kind='scatter')
 scatter_cnt.fig.set_size_inches(10,10)
 
@@ -30,7 +30,7 @@ scatter_cnt = sns.jointplot(x='windspeed', y='count', data=data_hour, kind='scat
 scatter_cnt.fig.set_size_inches(10,10)
 #Диаграмма демонстрирует обратную попорциональность
 
-#Распределение прокатаgj часам и сезонам
+#Распределение проката часам и сезонам
 fig,ax = plt.subplots()
 sns.pointplot(data=data_hour[['hour',
                            'count',
