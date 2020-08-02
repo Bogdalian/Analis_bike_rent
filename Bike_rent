@@ -14,11 +14,11 @@ data_hour.rename(columns={'instant':'id','dteday':'date',
                           'hr':'hour', 'weathersit': 'weather',
                          'cnt':'count'},inplace=True)
                          
-#удалим неинформативные признаки                   
+# удалим неинформативные признаки                   
 data_hour=data_hour.drop(['casual','registered'], axis=1)
 data_hour.head()
 
-#посмотрим статистическую информацию о целевой переменной
+# посмотрим статистическую информацию о целевой переменной
 data_hour['count'].describe()
 
 # построим диаграмму рассеяния, чтобы проанализировать влияние температуры на количество арендованных велосипедов 
