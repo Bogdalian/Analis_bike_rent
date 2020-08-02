@@ -21,16 +21,15 @@ data_hour.head()
 #посмотрим статистическую информацию о целевой переменной
 data_hour['count'].describe()
 
-#построим диаграмму рассеяния, чтобы проанализировать влияние температуры на количество арендованных велосипедов 
+# построим диаграмму рассеяния, чтобы проанализировать влияние температуры на количество арендованных велосипедов 
 scatter_cnt = sns.jointplot(x='temp', y='count', data=data_hour, kind='scatter')
 scatter_cnt.fig.set_size_inches(10,10)
 
-#Построим диаграмму, чтобы выявить, как влияет скорость ветра на целевую переменную count
+# Построим диаграмму, чтобы выявить, как влияет скорость ветра на целевую переменную count
 scatter_cnt = sns.jointplot(x='windspeed', y='count', data=data_hour, kind='scatter')
 scatter_cnt.fig.set_size_inches(10,10)
-#Диаграмма демонстрирует обратную попорциональность
 
-#Распределение проката часам и сезонам
+# Распределение проката часам и сезонам
 fig,ax = plt.subplots()
 sns.pointplot(data=data_hour[['hour',
                            'count',
@@ -40,7 +39,7 @@ sns.pointplot(data=data_hour[['hour',
                             x='hour',
                            ax=ax)
                            
-#То же самое, но по времени суток
+# То же самое, но по времени суток
 ax.set(title="Колличество проката от времени суток")
 fig,ax = plt.subplots()
 sns.pointplot(data=data_hour[['hour',
@@ -52,13 +51,13 @@ sns.pointplot(data=data_hour[['hour',
                             ax=ax)
  ax.set(title="Количество проката от дня недели")
  
-#Распределение по месяцам
+# Распределение по месяцам
 fig,ax = plt.subplots() 
 sns.barplot(data=data_hour[['month', 'count']], 
            x='month', y='count', ax=ax) 
 ax.set(title="Ежемесячное распределение")
 
-#Построим гистограмму, чтобы выявить аренду по сезонам
+# Построим гистограмму, чтобы выявить аренду по сезонам
 fig,ax = plt.subplots()
 sns.barplot(data=data_hour[['season',
                            'count']],
@@ -66,7 +65,7 @@ sns.barplot(data=data_hour[['season',
                             y='count',
                             ax=ax)
 
-#Построимматрицу корреляции,чтобы выявить неинформативные признкаки
+# Построимматрицу корреляции,чтобы выявить неинформативные признкаки
 CorrMat = data_day[['temp', 'hum','windspeed','cnt']].corr()
 fig,ax = plt.subplots()
 #Построим тепловую карту
@@ -87,7 +86,7 @@ poly_feat = PolynomialFeatures(3)
 X_train = poly_feat.fit_transform(X_train)
 X_test = poly_feat.fit_transform(X_test)
 
-#Используем линейную регрессию
+# Используем линейную регрессию
 from sklearn.linear_model import LinearRegression
 lr_model= LinearRegression()
 lr_model.fit(X_train,y_train)
