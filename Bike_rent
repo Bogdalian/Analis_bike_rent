@@ -108,7 +108,7 @@ poly_feat = PolynomialFeatures(3)
 X_train = poly_feat.fit_transform(X_train)
 X_test = poly_feat.fit_transform(X_test)
 
-#Используем градиентный бустинг
+# Используем градиентный бустинг
 from sklearn.ensemble import GradientBoostingRegressor
 model_gbr = GradientBoostingRegressor()
 model_gbr.fit(X_train, np.ravel(y_train))
